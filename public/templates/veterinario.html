@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Del Veterinario</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.4/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+        crossorigin="anonymous"></script>
+
+
+    <script src="	https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.4/js/dataTables.bootstrap5.min.js"></script>
+</head>
+
+<body onload="cargarReportes()">
+    <div class="modal fade" id="ModalTokenExpirado" tabindex="-1" aria-labelledby="ModalTokenExpiradoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class ="modal-title fs-5" id="ModalTokenExpiradoLabel">Sesión Expirada</h1>
+                    <button type="button" class="btn-close" onclick="recargar()" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tu sesión ha expirado. Por favor, inicia sesión nuevamente.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="redirigir()">Ingresar Nuevamente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ModalTokenCercano" tabindex="-1" aria-labelledby="ModalTokenCercanoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ModalTokenCercanoLabel">Sesión a Punto de Expirar</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tu sesión está a punto de expirar. ¿Deseas extenderla?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="extenderToken()">Extender sesión</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Notificacion -->
+    <div class="modal" id="ModalToken" tabindex="-1" aria-labelledby="ModalTokenLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="ModalTokenLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        onclick="cerrar()"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Mensaje de error -->
+                    <p>Tu sesión ha expirado. Por favor, inicia sesión nuevamente.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        onclick="cerrar()">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="extenderToken()">Extender sesion</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Secciones -->
+    <div class="bg-success ">
+        <div class="d-flex justify-content-between align-items-center py-3 mx-3 fw-bold">
+            <div class="justify-content-start">
+    
+                <a class="btn btn-success text-light fw-bold" ">
+                    <div id="info">
+                        hola
+                    </div>
+                </a>
+            </div>
+            <h1 class="text-white mx-auto">Panel Del Veterinario</h1>
+            <button class="btn btn-success fw-bold" data-bs-toggle="modal" data-bs-target="#logoutModal">Cerrar Sesión</button>
+        </div>
+        <ul class="nav nav-tabs pb-3 mx-1" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="btn btn btn-success text-light active fw-bold mx-1" id="estado_aves-tab"
+                    data-bs-toggle="tab" data-bs-target="#estado_aves-tab-pane" type="button" role="tab"
+                    aria-controls="estado_aves-tab-pane" aria-selected="true">Estado De Aves</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="btn btn btn-success fw-bold mx-1" text-light id="reportes-tab" data-bs-toggle="tab"
+                    data-bs-target="#reportes-tab-pane" type="button" role="tab" aria-controls="reportes-tab-pane"
+                    aria-selected="false">Reportes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="btn btn btn-success fw-bold mx-1" text-light id="historial_reportes-tab"
+                    data-bs-toggle="tab" data-bs-target="#historial_reportes-tab-pane" type="button" role="tab"
+                    aria-controls="historial_reportes-tab-pane" aria-selected="false">Historial Reportes</button>
+            </li>
+
+        </ul>
+    </div>
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="logoutModalLabel">Cerrar sesion</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas cerrar sesión?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-danger " id="logoutButton">Salir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Contenido de secciones -->
+    <div class="tab-content" id="myTabContent">
+        <!-- Tabla -->
+        <div class="tab-pane fade show active" id="estado_aves-tab-pane" role="tabpanel"
+            aria-labelledby="estado_aves-tab" tabindex="0">
+
+            <div class="container shadow p-3 mb-5 bg-light rounded mt-5">
+                <h1 class="text-center display-6 mt-3">Historial de
+                    salud de Aves</h1>
+                <div class="table-responsive mt-5">
+                    <table class="table">
+                        <thead class="table-success">
+                            <tr>
+                                <th scope="col" class="bg-success text-light">#</th>
+                                <th scope="col" class="bg-success text-light">Id del lote</th>
+                                <th scope="col" class="bg-success text-light">Fecha</th>
+                                <th scope="col" class="bg-success text-light">Diagnóstico</th>
+                                <th scope="col" class="bg-success text-light">Tratamiento</th>
+                                <th scope="col" class="bg-success text-light">No. Aves</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>101</td>
+                                <td>2024-05-28</td>
+                                <td>Desnutrición</td>
+                                <td>Suplementos nutricionales</td>
+                                <td>200</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>102</td>
+                                <td>2024-05-28</td>
+                                <td>Infección leve</td>
+                                <td>Antibióticos</td>
+                                <td>310</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Reportes -->
+        <div class="tab-pane fade" id="reportes-tab-pane" role="tabpanel" aria-labelledby="reportes-tab" tabindex="0">
+            <div class="container pt-5">
+                <form class="w-100 mx-auto border rounded-3 p-5 bg-white shadow-lg" id="form-reportes">
+                    <p class="text-center text-black display-6">Reportes</p>
+                    <input type="hidden" id="id-reporte">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <!-- <label for="id-usuario" class="form-label">Id
+                                Veterinario</label>
+                            <input type="number" min="0" class="form-control" id="id-usuario"> -->
+                            <label for="buscar">Seleccione el usuario</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Buscar..." aria-label="Buscar"
+                                    aria-describedby="btn-buscar" id="buscar">
+                                <button class="btn btn-success" type="button" id="btn-buscar">Buscar</button>
+                            </div>
+                            <div class="table-responsive collapse" id="div-buscar">
+                                <table class="table table-striped" id="tabla-buscar">
+                                    <thead>
+                                        <tr>
+                                            <td scope="col">Id Usuario</td>
+                                            <td scope="col">Nombre</td>
+                                            <td scope="col">Apellido</td>
+                                            <td scope="col">Seleccion</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha-registro" class="form-label">Fecha del
+                                Registro</label>
+                            <input type="date" class="form-control" id="fecha-registro">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id-lote" class="form-label">ID
+                                Lote</label>
+                            <input type="text" class="form-control" id="id-lote" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="estado-general" class="form-label">Estado
+                                General</label>
+                            <textarea class="form-control" id="estado-general"></textarea>
+                        </div>
+
+                        <!-- <div class="col-md-6 mb-3">
+                        <label for="id-galpon" class="form-label">ID Galpón</label>
+                        <input type="number" class="form-control" id="id-galpon" min="0">
+                    </div> -->
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="diagnostico" class="form-label">Diagnóstico</label>
+                            <textarea class="form-control" id="diagnostico" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="t-prescrito" class="form-label">Tratamiento
+                                Prescrito</label>
+                            <textarea class="form-control" id="t-prescrito" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dosis" class="form-label">Dosis
+                                Administrada</label>
+                            <input type="text" class="form-control" id="dosis">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="frecuencia-tratamiento" class="form-label">Frecuencia del
+                                Tratamiento</label>
+                            <input type="text" class="form-control" id="frecuencia-tratamiento">
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha-inicio-tratamiento" class="form-label">Fecha de Inicio del
+                                Tratamiento</label>
+                            <input type="date" class="form-control" id="fecha-inicio-tratamiento">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha-fin-tratamiento" class="form-label">Fecha de Finalización
+                                del
+                                Tratamiento</label>
+                            <input type="date" class="form-control" id="fecha-fin-tratamiento">
+                        </div>
+                        <!-- <div class="col-md-6 mb-3">
+                        <label for="formFile" class="form-label">Adjuntar Archivo</label>
+                        <input class="form-control" type="file" id="formFile">
+                    </div> -->
+                    </div>
+                    <!-- <span class="d-block pb-2">Firma digital aqui</span>
+                <div class="signature mb-2" style="width: 100%; height: 200px;">
+                    <canvas id="signature-canvas"
+                        style="border: 1px dashed red; width: 100%; height: 200px;"></canvas>
+                </div> -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="submit" class="btn btn-success">Registrar</button>
+                        
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- Historial de Reportes -->
+        <!-- Tabla -->
+        <div class="tab-pane fade" id="historial_reportes-tab-pane" role="tabpanel"
+            aria-labelledby="historial_reportes-tab" tabindex="0">
+            <div class="container mt-5 table-responsive">
+                <table class="table table-striped mt-2" id="tabla-reportes">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="bg-success text-light">Id Reporte</th>
+                            <th scope="col" class="bg-success text-light">Id Lote</th>
+                            <th scope="col" class="bg-success text-light">Fecha De Registro</th>
+                            <th scope="col" class="bg-success text-light">Responsable </th>
+                            <th scope="col" class="bg-success text-light">Acciones</th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas se llenarán dinámicamente -->
+                    </tbody>
+                </table>
+
+
+                <!-- Modal de Edición -->
+                <div class="modal fade " id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editModalLabel">Editar Reporte</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="form-edit-reportes">
+                                    <input type="hidden" id="edit-id-reporte">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+
+                                            <!-- <label for="edit-id-usuario" class="form-label">Id
+                                                Veterinario</label>
+                                            <input type="number" min="0" class="form-control" id="edit-id-usuario"> -->
+                                            <label for="edit-buscar">Seleccione el usuario</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" placeholder="Buscar..."
+                                                    aria-label="Buscar" aria-describedby="btn-buscar" id="edit-buscar">
+                                                <button class="btn btn-success" type="button"
+                                                    id="btn-edit-buscar">Buscar</button>
+                                            </div>
+                                            <div class=" table-responsive collapse" id="editDivBuscar">
+                                                <table class="table table-striped "
+                                                    id="tabla-edit-buscar">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Id Usuario</td>
+                                                            <td>Nombre</td>
+                                                            <td>Apellido</td>
+                                                            <td>Seleccion</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-fecha-registro" class="form-label">Fecha del
+                                                Registro</label>
+                                            <input type="date" class="form-control" id="edit-fecha-registro">
+                                        </div>
+
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="edit-id-lote" class="form-label">ID
+                                                Lote</label>
+                                            <input type="number" class="form-control" id="edit-id-lote" min="0">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-estado-general" class="form-label">Estado
+                                                General</label>
+                                            <textarea class="form-control" id="edit-estado-general"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="edit-diagnostico" class="form-label">Diagnóstico</label>
+                                            <textarea class="form-control" id="edit-diagnostico" rows="3"></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-t-prescrito" class="form-label">Tratamiento
+                                                Prescrito</label>
+                                            <textarea class="form-control" id="edit-t-prescrito" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="edit-dosis" class="form-label">Dosis
+                                                Administrada</label>
+                                            <input type="text" class="form-control" id="edit-dosis">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-frecuencia-tratamiento" class="form-label">Frecuencia
+                                                del Tratamiento</label>
+                                            <input type="text" class="form-control" id="edit-frecuencia-tratamiento">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="edit-fecha-inicio-tratamiento" class="form-label">Fecha de
+                                                Inicio del Tratamiento</label>
+                                            <input type="date" class="form-control" id="edit-fecha-inicio-tratamiento">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="edit-fecha-fin-tratamiento" class="form-label">Fecha de
+                                                Finalización del
+                                                Tratamiento</label>
+                                            <input type="date" class="form-control" id="edit-fecha-fin-tratamiento">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Cerrar</button>
+                                        <button type="button" class="btn btn-success"
+                                            onclick="guardarCambiosReportes()">Guardar
+                                            Cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+        <div class="tab-pane fade" id="disabled-tab-pane" role="tabpanel" aria-labelledby="disabled-tab" tabindex="0">
+            ...
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="../static/Jscript/veterinario.js"></script>
+        <script src="../static/Jscript/token.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.min.js"></script> -->
+</body>
+
+
+</html>
